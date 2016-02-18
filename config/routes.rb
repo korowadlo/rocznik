@@ -7,6 +7,7 @@ Rails.application.routes.draw do
     get :prepare_form, on: :member
     patch :prepare, on: :member
     patch :publish, on: :member
+    patch :position, on: :member
     get :show_reviews, on: :member
   end
   resources :public_issues, only: [:index,:show]
