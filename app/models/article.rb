@@ -6,6 +6,7 @@ class Article < ActiveRecord::Base
     "opublikowany" => :published
   }
   validates :status, presence: true, inclusion: STATUS_MAPPING.keys
+  validates :issue_position, on: :patch, numericality: { only_integer: true, greater_than_or_equal: 1}
   belongs_to :issue
   belongs_to :submission
 
@@ -92,4 +93,50 @@ class Article < ActiveRecord::Base
   def to_param
     [id, title.parameterize].join("-")
   end
+
+  def map_position
+    articles = get_articles
+    table = Array.new
+    articles.each do |article|
+      table << article.issue_position
+    end
+    table
+  end
+
+  def update_article_position down = ""
+    articles = get_positions
+    if down.empty?
+      article_position_flip [articles[:article_next]]
+    else
+      article_position_flip [articles[:article_prev]]
+    end
+  end
+
+  private
+    def get_positions
+      articles = get_articles
+
+      {article_next: get_next_article(articles),
+       article_prev: get_prev_article(articles)}
+    end
+
+    def get_articles
+      Article.all.where("issue_id = ?", self.issue_id)
+    end
+
+    def get_next_article articles
+      articles.where("issue_position > ?", self.issue_position).order(issue_position: :asc).limit(1).first
+    end
+
+    def get_prev_article articles
+      articles.where("issue_position < ?", self.issue_position).order(issue_position: :desc).limit(1).first
+    end
+
+    def article_position_flip article
+      if !article[0].nil?
+        halp = self.issue_position
+        self.update_attributes(issue_position: article[0].issue_position)
+        article[0].update_attributes(issue_position: halp)
+      end
+    end
 end

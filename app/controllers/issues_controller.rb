@@ -64,25 +64,10 @@ class IssuesController < ApplicationController
     @issue = Issue.find_by_volume(params[:id])
   end
 
-
-  def position
-    @article = Article.find_by(submission_id: params[:sub])
-    @issue = Issue.find_by_volume(params[:id])
-    if @article.update_attributes(position_params)
-      redirect_to @issue
-    else
-      render :edit
-    end
-  end
-
   private
 
   def issue_params
     params.require(:issue).permit(:year,:volume)
-  end
-
-  def position_params
-    params.require(:article).permit(:issue_position)
   end
 
 end
