@@ -2,7 +2,6 @@ class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
-  include ApplicationHelper
   helper_method :user?, :admin?, :request_uri
   before_action -> {set_title}
 
@@ -35,5 +34,8 @@ class ApplicationController < ActionController::Base
       flash[:error] = 'Akcja wymaga uprawnień tego użytkownika'
       redirect_to new_user_session_path
     end
+  end
+  def set_title title=""
+    @site_title = !title.empty? ? title + " - " + "Rocznik Kognitywistyczny" : "Rocznik Kognitywistyczny"
   end
 end
